@@ -96,7 +96,6 @@ export default {
       }
     },
     initEvents(layer) {
-      console.log(layer);
       var selectAssocier = document.createElement("select");
       selectAssocier.className = "buildings-selector form-select-sm";
       var opt = document.createElement("option");
