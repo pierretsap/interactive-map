@@ -58,7 +58,14 @@ export default {
   /* margin-top: 60px; */
 }
 .map-div {
-  padding-left: 0px;
-  height: 95vh;
+  height: 85vh;
+  padding: 0px;
+  width: 66%;
 }
+.address-list {
+  overflow-y: scroll;
+  height: 85vh;
+  padding: 0px;
+}
+
 </style>

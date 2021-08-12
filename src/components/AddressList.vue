@@ -12,6 +12,10 @@
         {{ building.name }}<template v-if="building.layer">, {{ building.layer._leaflet_id }}</template>
       </li>
     </ul>
+    <div class='add-to-list'>
+      <input type="text" v-model="elementToAdd" @keyup.enter="addToList(elementToAdd)">
+      <button @click="addToList(elementToAdd)">Ajouter</button>
+    </div>
   </div>
 </template>
 
@@ -20,9 +24,17 @@ export default {
   name: "AddressList",
   props: ["buildings"],
   data() {
-    return {};
+    return {
+      elementToAdd: ''
+    };
   },
   methods: {
+    addToList(element){
+      if (this.elementToAdd != '') {
+        this.buildings.push({name: element, layer: null});
+        this.elementToAdd=''
+      }
+    },
     changeLayerColor(e,i) {
       var layer = this.buildings[i].layer;
       if (layer != null && layer._latlngs != undefined) {
@@ -40,10 +52,6 @@ export default {
 </script>
 
 <style lang="css" scoped>
-.address-list {
-  overflow-y: scroll;
-  height: 95vh;
-}
 li {
   background-color: lightgray;
 }
