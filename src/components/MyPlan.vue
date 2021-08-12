@@ -1,14 +1,12 @@
 <template>
-<div>
-  <l-map id="map" ref="myMap" :zoom="zoom" :center="center" @ready="onMapReady">
-    <!-- Tile Layer -->
-    <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-    <!-- Controls -->
-    <l-control-fullscreen position="topright" :options="{ title: { 'false': 'Open full screen', 'true': 'Close full screen' } }"/>
-    <l-control-scale position="bottomright" :imperial="false" :metric="true"></l-control-scale>
-    <!-- Free draw -->
-    <l-freedraw ref="freeDraw" :mode="mode" v-on:markers="clearFreeDraw($event)"/>
-  </l-map>
+  <div>
+    <l-map id="plan" ref="myPlan" :zoom="zoom" :center="center" :crs="crs" @ready="onPlanReady">
+      <l-image-overlay :url="imgUrl" :bounds="bounds" />
+      <!-- Controls -->
+      <l-control-fullscreen position="topright" :options="{ title: { 'false': 'Open full screen', 'true': 'Close full screen' } }"/>
+      <!-- Free draw -->
+      <l-freedraw ref="freeDraw" :mode="mode" v-on:markers="clearFreeDraw($event)"/>
+    </l-map>
   </div>
 </template>
 
@@ -16,7 +14,7 @@
 // Leaflet
 import L from "leaflet";
 
-import { LMap, LTileLayer, LControlScale } from "vue2-leaflet";
+import { LMap, LImageOverlay } from "vue2-leaflet";
 
 // Leaflet fullscreen
 import LControlFullscreen from 'vue2-leaflet-fullscreen';
@@ -39,7 +37,7 @@ Icon.Default.mergeOptions({
 });
 
 export default {
-  name: "MyMap",
+  name: "MyPlan",
   props: {
     buildings: {
       type: Array,
@@ -47,19 +45,19 @@ export default {
   },
   components: {
     LMap,
-    LTileLayer,
-    LControlScale,
     "l-freedraw": LFreeDraw,
+    LImageOverlay,
     LControlFullscreen
   },
   data() {
     return {
-      zoom: 17,
-      center: L.latLng(50.60810645746167, 3.1448793411254887),
-      url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      zoom: -1,
+      center: L.latLng(-556/2, 689/2),
+      imgUrl: "https://e7.pngegg.com/pngimages/314/132/png-clipart-floor-plan-architecture-facade-design-angle-building.png",
+      bounds: [[0, 0], [-556, 689]],
+      crs: L.CRS.Simple,
 
-      map: null,
+      plan: null,
       freeDraw: null,
       freeDrawControl: null,
       mode: NONE,
@@ -98,6 +96,7 @@ export default {
       }
     },
     initEvents(layer) {
+      console.log(layer);
       var selectAssocier = document.createElement("select");
       selectAssocier.className = "buildings-selector form-select-sm";
       var opt = document.createElement("option");
@@ -126,7 +125,7 @@ export default {
         this.updateBuildingsSelectors(event.target);
       });
 
-      this.map.on("layerremove", (event) => {
+      this.plan.on("layerremove", (event) => {
         for (const building of this.buildings) {
           if (building.layer == event.layer) {
             building.layer = null;
@@ -170,7 +169,7 @@ export default {
       if (event.eventType == "create" && event.latLngs.length > 0) {
         var latLngs = event.latLngs[0];
         this.freeDraw.clear();
-        var polygon = L.polygon(latLngs).addTo(this.map);
+        var polygon = L.polygon(latLngs).addTo(this.plan);
         this.initEvents(polygon);
         if (this.freeDrawControl.toggled()) {
           this.freeDrawControl.toggle();
@@ -178,8 +177,8 @@ export default {
         this.freeDraw.mode(NONE);
       }
     },
-    onMapReady() {
-      this.map.pm.addControls({
+    onPlanReady() {
+      this.plan.pm.addControls({
         position: "topleft",
         drawCircle: false,
         drawPolyline: false,
@@ -199,11 +198,11 @@ export default {
   computed: {
   },
   mounted() {
-    this.map = this.$refs.myMap.mapObject;
-    this.map.on('pm:create', e => this.initEvents(e.layer));
+    this.plan = this.$refs.myPlan.mapObject;
+    this.plan.on('pm:create', e => this.initEvents(e.layer));
     this.$nextTick(() => {
       this.freeDraw = this.$refs.freeDraw.mapObject;
-      this.freeDrawControl = this.map.pm.Toolbar.createCustomControl({
+      this.freeDrawControl = this.plan.pm.Toolbar.createCustomControl({
         name: "Draw Freely",
         title: "Draw Freely",
         className: "leaflet-pm-icon-freedraw",
@@ -223,7 +222,7 @@ export default {
           },
         ],
       });
-      this.toolTipsControl = this.map.pm.Toolbar.createCustomControl({
+      this.toolTipsControl = this.plan.pm.Toolbar.createCustomControl({
         name: "Hide Tooltips",
         title: "Hide/Show",
         block: 'custom',
