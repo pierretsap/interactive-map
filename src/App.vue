@@ -25,7 +25,7 @@ export default {
       if (this.mapToggle) {
         setTimeout(() => { this.$refs.myMap.map.invalidateSize(); }, 10);
       } else {
-        setTimeout(() => { this.$refs.myPlan.plan.invalidateSize(); }, 10);
+        setTimeout(() => { this.$refs.myPlan.map.invalidateSize(); }, 10);
       }
       this.mapToggle = !this.mapToggle;
       this.msg = (this.mapToggle?'Plan':'Map') + ' using Vue2';
