@@ -1,8 +1,5 @@
 export default {
     methods: {
-    foo: function () {
-      console.log(this.map)
-    },
     indexOfBuildingName(name){
       for (let i = 0; i < this.buildings.length; i++) {
         const building = this.buildings[i];
