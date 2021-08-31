@@ -1,5 +1,8 @@
 # interactive-map
 
+## Project demo 
+https://pierretsap.github.io/interactive-map/
+
 ## Project setup
 ```
 npm install
